@@ -1,5 +1,5 @@
 #Importing modules
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -21,9 +21,58 @@ class Todo(db.Model):
 ##Routes:
 
 #Route for the home page
-@app.route('/')
+@app.route('/', methods= ['POST', 'GET'])
 def index():
-    return render_template('index.html')
+    if request.method == 'POST':
+        task_content = request.form['content'] #Getting the task content from the form
+        new_task = Todo(content = task_content) #Creating a new task object and set its content
+        
+        try:
+            db.session.add(new_task) #Adding the new task to the database
+            db.session.commit() #Commiting the changes
+            return redirect('/') #Redirecting to the home page
+        except:
+            return 'There was an issue adding your task'
+        
+    else:
+        
+        #Getting all the tasks from the database and ordering them by date of creation
+        tasks = Todo.query.order_by(Todo.date_created).all() 
+        
+        return render_template('index.html', tasks = tasks) #Rendering the home page with the tasks
+
+#Route for deleting a task       
+@app.route('/delete/<int:id>')
+def delete(id):
+    
+    #Getting the task to delete
+    task_to_delete = Todo.query.get_or_404(id)
+    
+    try:
+        db.session.delete(task_to_delete) #Deleting the task
+        db.session.commit() #Commiting the changes
+        return redirect('/') #Redirecting to the home page
+    except:
+        return 'There was a problem deleting the task'
+    
+#Route for updating a task
+@app.route('/update/<int:id>', methods = ['GET', 'POST'])
+def update(id):
+    
+    #Getting the task to update
+    task = Todo.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        task.content = request.form['content']
+        
+        try:
+            db.session.commit() #Commiting the changes
+            return redirect('/') #Redirecting to the home page
+        except:
+            return 'There was an issue updating your task'
+        
+    else:
+        return render_template('update.html', task = task)
 
 # Run the app
 if __name__ == '__main__':

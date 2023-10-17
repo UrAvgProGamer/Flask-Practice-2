@@ -2,3 +2,19 @@ body{
     margin: 0;
     font-family: sans-serif;
 }
+
+.content {
+    text-align: center;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 5px;
+    margin: 0 auto;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid black;
+}
