@@ -100,3 +100,15 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+.bottom-bar {
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0; /* Adjusted padding */
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    font-family: 'Courier New', monospace; /* Set font to Courier New */
+    font-size: 0.8em; /* Adjusted font size for mobile */
+}
