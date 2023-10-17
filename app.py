@@ -42,7 +42,7 @@ def index():
         return render_template('index.html', tasks = tasks) #Rendering the home page with the tasks
 
 #Route for deleting a task       
-@app.route('/delete/<int:id>')
+@app.route('/delete/<int:id>',methods = ['POST'])
 def delete(id):
     
     #Getting the task to delete
