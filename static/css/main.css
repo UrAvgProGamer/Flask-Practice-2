@@ -43,6 +43,11 @@ th, td {
     border: 1px solid #555;
     background-color: #555; /* Dark Gray */
     color: #fff; /* Set text color to white */
+    border-bottom: 1px solid #444; /* Slight border below each task */
+}
+
+th:last-child, td:last-child {
+    border-right: none; /* Remove border on the last column */
 }
 
 th {

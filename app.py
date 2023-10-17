@@ -33,7 +33,8 @@ def index():
             except Exception as e:
                 return f'There was an issue adding your task: {e}'
         else:
-            return 'Task content cannot be empty'
+            return render_template('popup.html')  # Render the popup template
+
     else:
         # Getting all the tasks from the database and ordering them by date of creation
         tasks = Todo.query.order_by(Todo.date_created).all()
@@ -42,33 +43,37 @@ def index():
 # Route for deleting a task
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete(id):
-    # Getting the task to delete
     task_to_delete = Todo.query.get_or_404(id)
     try:
-        db.session.delete(task_to_delete)  # Deleting the task
-        db.session.commit()  # Committing the changes
-        return redirect('/')  # Redirecting to the home page
+        db.session.delete(task_to_delete)
+        db.session.commit()
+        return redirect('/')
     except Exception as e:
         return f'There was a problem deleting the task: {e}'
 
 # Route for updating a task
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
-    # Getting the task to update
     task = Todo.query.get_or_404(id)
+
     if request.method == 'POST':
-        task_content = request.form.get('content')  # Getting updated content from the form
-        if task_content is not None and task_content.strip():  # Check for non-empty content
+        task_content = request.form.get('content')
+        if task_content is not None and task_content.strip():
             task.content = task_content
             try:
-                db.session.commit()  # Committing the changes
-                return redirect('/')  # Redirecting to the home page
+                db.session.commit()
+                return redirect('/')
             except Exception as e:
                 return f'There was an issue updating your task: {e}'
         else:
-            return 'Task content cannot be empty'
+            return render_template('popup.html')
     else:
-        return render_template('update.html', task=task)  # Rendering the update page with the task
+        return render_template('update.html', task=task)
+
+# Route for displaying popup
+@app.route('/popup')
+def popup():
+    return render_template('popup.html')
 
 # Run the app
 if __name__ == '__main__':
