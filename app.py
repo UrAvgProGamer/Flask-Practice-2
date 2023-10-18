@@ -117,11 +117,11 @@ def update(id):
 def popup():
     return render_template('popup.html')
 
-# # Route for displaying user information
-# @app.route('/users')
-# def users():
-#     users = User.query.all()
-#     return render_template('users.html', users=users)
+# Route for displaying user information
+@app.route('/users')
+def users():
+    users = User.query.all()
+    return render_template('users.html', users=users)
 
 # Run the app
 if __name__ == '__main__':
