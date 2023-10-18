@@ -2,73 +2,51 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 # Setting up the Flask app
 app = Flask(__name__)
+app.secret_key = 'e1a139751d4d7926bb9d4d1faea91a0ffcdc05321a54d750'
 
 # Setting up the SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config.from_pyfile('instance/config.py')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Define the User model
-class User(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
+    tasks = db.relationship('Todo', backref='user', lazy=True)  # Define the relationship with tasks
 
 # Define the Todo model
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200), nullable=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Add user_id foreign key
 
     def __repr__(self):
         return f'<Task {self.id}>'
 
-# Route for the login page
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
 
-        user = User.query.filter_by(username=username, password=password).first()
-
-        if user:
-            return redirect('/index')
-        else:
-            return 'Invalid username or password. Please try again.'
-
-    return render_template('login.html')
-
-# Route for registering a new user
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        if not username or not password:
-            return 'Both username and password are required.'
-
-        new_user = User(username=username, password=password)
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-            return 'User registered successfully!'
-        except Exception as e:
-            return f'There was an issue registering the user: {e}'
-
-    return render_template('register.html')
-
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # Route for the home page
 @app.route('/index', methods=['POST', 'GET'])
+@login_required
 def index():
     if request.method == 'POST':
         task_content = request.form.get('content')
         if task_content is not None and task_content.strip():
-            new_task = Todo(content=task_content)
+            new_task = Todo(content=task_content, user=current_user)  # Set user_id using current_user
             try:
                 db.session.add(new_task)
                 db.session.commit()
@@ -79,7 +57,7 @@ def index():
             return render_template('popup.html')
 
     else:
-        tasks = Todo.query.order_by(Todo.date_created).all()
+        tasks = current_user.tasks  # Get tasks associated with current user
         return render_template('index.html', tasks=tasks)
 
 # Route for deleting a task
@@ -116,6 +94,44 @@ def update(id):
 @app.route('/popup')
 def popup():
     return render_template('popup.html')
+
+# Route for the login page
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(username=username, password=password).first()
+
+        if user:
+            login_user(user)  # Log in the user
+            next_page = request.args.get('next')  # Get the next parameter from the URL
+            return redirect(next_page or '/index')  # Redirect to next page or /index
+
+        return 'Invalid username or password. Please try again.'
+
+    return render_template('login.html')
+
+# Route for registering a new user
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if not username or not password:
+            return 'Both username and password are required.'
+
+        new_user = User(username=username, password=password)
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            return 'User registered successfully!'
+        except Exception as e:
+            return f'There was an issue registering the user: {e}'
+
+    return render_template('register.html')
 
 # Route for displaying user information
 @app.route('/users')
