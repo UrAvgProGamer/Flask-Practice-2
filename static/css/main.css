@@ -70,6 +70,17 @@ input[type="text"] {
     margin-bottom: 10px;
 }
 
+input[type="password"] {
+    width: 100%;
+    box-sizing: border-box; /* Include padding and border in width */
+    padding: 8px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #666; /* Dark Gray */
+    color: #fff;
+    margin-bottom: 10px;
+}
+
 input[type="submit"] {
     width: 100%;
     padding: 8px 10px;
@@ -111,4 +122,8 @@ a:hover {
     bottom: 0;
     font-family: 'Courier New', monospace; /* Set font to Courier New */
     font-size: 0.8em; /* Adjusted font size for mobile */
+}
+.content p {
+    font-size: 0.8em; /* Adjusted font size */
+    font-family: 'Courier New', monospace; /* Set font to Courier New */
 }
