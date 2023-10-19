@@ -154,11 +154,6 @@ def users():
     users = User.query.all()
     return render_template('users.html', users=users)
 
-# Route for displaying popup
-@app.route('/popup')
-def popup():
-    return render_template('popup.html')
-
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
