@@ -9,10 +9,15 @@
 <body>
     {% block body %}{% endblock %}
 
+    <!-- Error Message Div -->
+    {% if error_message %}
+        <div class="error-message" id="error-message">{{ error_message }}</div>
+    {% endif %}
+
     <!-- Bottom Bar -->
     <div class="bottom-bar">
         <p>Developed by: Vansh Raja 😊</p>
     </div>
-
+    
 </body>
 </html>

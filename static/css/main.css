@@ -70,6 +70,17 @@ input[type="text"] {
     margin-bottom: 10px;
 }
 
+input[type="password"] {
+    width: 100%;
+    box-sizing: border-box; /* Include padding and border in width */
+    padding: 8px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #666; /* Dark Gray */
+    color: #fff;
+    margin-bottom: 10px;
+}
+
 input[type="submit"] {
     width: 100%;
     padding: 8px 10px;
@@ -105,10 +116,32 @@ a:hover {
     background-color: #222;
     color: #fff;
     text-align: center;
-    padding: 5px 0; /* Adjusted padding */
+    padding: 5px 0; 
     position: fixed;
     width: 100%;
     bottom: 0;
+    font-family: 'Courier New', monospace; 
+    font-size: 0.8em; 
+    display: flex; /* Added for flexbox */
+    justify-content: center; /* Added to center content horizontally */
+    line-height: 1.2; 
+}
+.content p {
+    font-size: 0.8em; /* Adjusted font size */
     font-family: 'Courier New', monospace; /* Set font to Courier New */
-    font-size: 0.8em; /* Adjusted font size for mobile */
+}
+
+.error-message {
+    position: fixed;
+    bottom: 10vh; /* Adjusted position to be 10% from the bottom of the viewport */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff3333;
+    color: #fff;
+    padding: 2vh 5vw; /* Adjusted padding using viewport units */
+    border-radius: 5px;
+    font-size: 2vh; /* Adjusted font size using viewport units */
+    z-index: 999;
+    margin: 0 2vw; /* Adjusted margin using viewport units */
+    max-width: 90vw; /* Adjusted max-width using viewport units */
 }
