@@ -145,3 +145,11 @@ a:hover {
     margin: 0 2vw; /* Adjusted margin using viewport units */
     max-width: 90vw; /* Adjusted max-width using viewport units */
 }
+
+.logout-link {
+    float: right;
+    margin-top: -30px; /* Adjust this value to position it properly */
+    margin-right: 20px; /* Adjust this value to set the right margin */
+    color: #fff;
+    text-decoration: none;
+}
