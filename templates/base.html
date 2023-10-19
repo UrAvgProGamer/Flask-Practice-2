@@ -9,9 +9,9 @@
 <body>
     {% block body %}{% endblock %}
 
-    <!-- Error Message Textarea -->
+    <!-- Error Message Div -->
     {% if error_message %}
-        <textarea id="error-message" readonly>{{ error_message }}</textarea>
+        <div class="error-message" id="error-message">{{ error_message }}</div>
     {% endif %}
 
     <!-- Bottom Bar -->
