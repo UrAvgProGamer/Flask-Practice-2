@@ -127,3 +127,7 @@ a:hover {
     font-size: 0.8em; /* Adjusted font size */
     font-family: 'Courier New', monospace; /* Set font to Courier New */
 }
+.error-message {
+    color: red;
+    font-size: 16px;
+}

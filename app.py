@@ -43,6 +43,9 @@ def load_user(user_id):
 @app.route('/index', methods=['POST', 'GET'])
 @login_required
 def index():
+    global error_message
+    error_message = ""  # Reset error message on each request
+    
     if request.method == 'POST':
         task_content = request.form.get('content')
         if task_content is not None and task_content.strip():
@@ -52,28 +55,34 @@ def index():
                 db.session.commit()
                 return redirect('/index')
             except Exception as e:
-                return f'There was an issue adding your task: {e}'
+                error_message = f'There was an issue adding your task: {e}'
         else:
-            return render_template('popup.html')
-
-    else:
-        tasks = current_user.tasks  # Get tasks associated with current user
-        return render_template('index.html', tasks=tasks)
+            error_message = 'Task content cannot be empty'
+    
+    tasks = current_user.tasks  # Get tasks associated with current user
+    return render_template('index.html', tasks=tasks, error_message=error_message)
 
 # Route for deleting a task
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete(id):
+    global error_message
+    error_message = ""  # Reset error message on each request
+    
     task_to_delete = Todo.query.get_or_404(id)
     try:
         db.session.delete(task_to_delete)
         db.session.commit()
         return redirect('/index')
     except Exception as e:
-        return f'There was a problem deleting the task: {e}'
+        error_message = f'There was a problem deleting the task: {e}'
+        return redirect('/index')
 
 # Route for updating a task
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
+    global error_message
+    error_message = ""  # Reset error message on each request
+    
     task = Todo.query.get_or_404(id)
 
     if request.method == 'POST':
@@ -84,20 +93,20 @@ def update(id):
                 db.session.commit()
                 return redirect('/index')
             except Exception as e:
-                return f'There was an issue updating your task: {e}'
+                error_message = f'There was an issue updating your task: {e}'
+                return redirect(f'/update/{id}')
         else:
-            return render_template('popup.html')
+            error_message = 'Task content cannot be empty'
+            return redirect(f'/update/{id}')
     else:
-        return render_template('update.html', task=task)
-
-# Route for displaying popup
-@app.route('/popup')
-def popup():
-    return render_template('popup.html')
+        return render_template('update.html', task=task, error_message=error_message)
 
 # Route for the login page
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    global error_message
+    error_message = ""  # Reset error message on each request
+    
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -109,19 +118,24 @@ def login():
             next_page = request.args.get('next')  # Get the next parameter from the URL
             return redirect(next_page or '/index')  # Redirect to next page or /index
 
-        return 'Invalid username or password. Please try again.'
-
-    return render_template('login.html')
+        error_message = 'Invalid username or password. Please try again.'
+        return redirect('/')
+    
+    return render_template('login.html', error_message=error_message)
 
 # Route for registering a new user
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    global error_message
+    error_message = ""  # Reset error message on each request
+    
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
 
         if not username or not password:
-            return 'Both username and password are required.'
+            error_message = 'Both username and password are required.'
+            return redirect('/register')
 
         new_user = User(username=username, password=password)
         try:
@@ -129,15 +143,21 @@ def register():
             db.session.commit()
             return 'User registered successfully!'
         except Exception as e:
-            return f'There was an issue registering the user: {e}'
+            error_message = f'There was an issue registering the user: {e}'
+            return redirect('/register')
 
-    return render_template('register.html')
+    return render_template('register.html', error_message=error_message)
 
 # Route for displaying user information
 @app.route('/users')
 def users():
     users = User.query.all()
     return render_template('users.html', users=users)
+
+# Route for displaying popup
+@app.route('/popup')
+def popup():
+    return render_template('popup.html')
 
 # Run the app
 if __name__ == '__main__':
